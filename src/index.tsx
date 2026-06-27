@@ -10,6 +10,52 @@ type Settings = {
   accent_color?: string;
 };
 
+type MarkdownToken =
+  | { type: "bold"; content: string }
+  | { type: "italic"; content: string }
+  | { type: "strike"; content: string }
+  | { type: "code"; content: string }
+  | { type: "text"; content: string };
+
+function parseInlineMarkdown(text: string): MarkdownToken[] {
+  const tokens: MarkdownToken[] = [];
+  const pattern = /(\*\*(.+?)\*\*|\*(.+?)\*|~~(.+?)~~|`(.+?)`)/g;
+  let last = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = pattern.exec(text)) !== null) {
+    if (match.index > last) {
+      tokens.push({ type: "text", content: text.slice(last, match.index) });
+    }
+    if (match[2] !== undefined) tokens.push({ type: "bold", content: match[2] });
+    else if (match[3] !== undefined) tokens.push({ type: "italic", content: match[3] });
+    else if (match[4] !== undefined) tokens.push({ type: "strike", content: match[4] });
+    else if (match[5] !== undefined) tokens.push({ type: "code", content: match[5] });
+    last = match.index + match[0].length;
+  }
+
+  if (last < text.length) {
+    tokens.push({ type: "text", content: text.slice(last) });
+  }
+
+  return tokens;
+}
+
+function MarkdownLabel({ text, style }: { text: string; style: React.CSSProperties }) {
+  const tokens = parseInlineMarkdown(text);
+  return (
+    <div style={style}>
+      {tokens.map((token, i) => {
+        if (token.type === "bold") return <strong key={i}>{token.content}</strong>;
+        if (token.type === "italic") return <em key={i}>{token.content}</em>;
+        if (token.type === "strike") return <s key={i}>{token.content}</s>;
+        if (token.type === "code") return <code key={i} style={{ fontFamily: "monospace" }}>{token.content}</code>;
+        return <span key={i}>{token.content}</span>;
+      })}
+    </div>
+  );
+}
+
 const createVisualization: CreateCustomVisualization<Settings> = ({
   defineSetting,
 }) => {
@@ -48,7 +94,8 @@ const createVisualization: CreateCustomVisualization<Settings> = ({
             : "var(--mb-color-bg-white, #ffffff)",
         }}
       >
-        <div
+        <MarkdownLabel
+          text={title}
           style={{
             fontSize: titleSize,
             fontWeight: 600,
@@ -59,9 +106,7 @@ const createVisualization: CreateCustomVisualization<Settings> = ({
             letterSpacing: "0.08em",
             textAlign: "center",
           }}
-        >
-          {title}
-        </div>
+        />
         <div
           style={{
             fontSize,
