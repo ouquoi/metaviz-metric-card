@@ -3,7 +3,8 @@ import type { Settings } from "./types";
 
 function formatValue(value: unknown, opts: { column: unknown }): string {
   try {
-    return String(mbFormatValue(value, opts));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return String(mbFormatValue(value as any, opts as any));
   } catch {
     if (typeof value === "number") {
       return new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }).format(value);
@@ -73,6 +74,8 @@ export function MetricCard({
   const subtitle = settings.subtitle;
   const accentColor = settings.accent_color || "var(--mb-color-brand)";
   const isDark = colorScheme === "dark";
+
+  if (!width || !height) return null;
 
   const fontSize = Math.min(width / 6, height / 2.5, 72);
   const titleSize = Math.max(fontSize * 0.28, 13);
