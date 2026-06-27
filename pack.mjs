@@ -1,9 +1,6 @@
 /* global Buffer, console */
 // Packages metabase-plugin.json + dist/ into <name>-<version>.tgz at the
 // project root, ready to upload via Admin → Custom visualizations → Add.
-//
-// Produces a minimal POSIX ustar archive (no PAX headers, no GNU extensions)
-// to avoid Java tar parser counting hidden header blocks as entries.
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -32,34 +29,50 @@ const assetNames = Array.from(new Set([
   ...(manifest.assets ?? []),
 ]));
 
-// Build a minimal ustar tar archive manually — no PAX headers, no dir entries.
-// Each entry = 512-byte header + data padded to 512-byte boundary.
-// Archive ends with two 512-byte zero blocks.
+// Build a ustar tar archive matching the format Java's TarArchiveInputStream expects.
+// Field formats (from POSIX ustar spec, as produced by tar-stream):
+//   8-byte octal fields (mode, uid, gid, devmajor, devminor): "NNNNNN \0" (6 digits + space + null)
+//  12-byte octal fields (size, mtime):                         "NNNNNNNNNNN " (11 digits + space)
+//  checksum:                                                   "NNNNNN \0" (6 digits + space + null)
 function makeTarHeader(filePath, size) {
   const buf = Buffer.alloc(512, 0);
 
-  // name (100 bytes)
+  // name (100 bytes, null-padded)
   buf.write(filePath.slice(0, 100), 0, "utf8");
-  // mode (8 bytes)
-  buf.write("0000644\0", 100, "ascii");
-  // uid / gid (8 bytes each)
-  buf.write("0000000\0", 108, "ascii");
-  buf.write("0000000\0", 116, "ascii");
-  // size (12 bytes, octal)
-  buf.write(size.toString(8).padStart(11, "0") + "\0", 124, "ascii");
-  // mtime (12 bytes, octal) — fixed epoch to keep builds deterministic
-  buf.write("00000000000\0", 136, "ascii");
+
+  // mode: 6 octal digits + space + null
+  buf.write("000644 \0", 100, "ascii");
+
+  // uid: 6 octal digits + space + null
+  buf.write("000000 \0", 108, "ascii");
+
+  // gid: 6 octal digits + space + null
+  buf.write("000000 \0", 116, "ascii");
+
+  // size: 11 octal digits + space (12 bytes, no null)
+  buf.write(size.toString(8).padStart(11, "0") + " ", 124, "ascii");
+
+  // mtime: 11 octal digits + space (fixed epoch for deterministic builds)
+  buf.write("00000000000 ", 136, "ascii");
+
   // typeflag: '0' = regular file
   buf[156] = 0x30;
-  // ustar magic + version
+
+  // ustar magic (offset 257, 6 bytes) + null
   buf.write("ustar\0", 257, "ascii");
+  // version "00" (offset 263, 2 bytes)
   buf.write("00", 263, "ascii");
 
-  // checksum: sum of all bytes with checksum field treated as spaces (0x20)
+  // devmajor: 6 octal digits + space + null (offset 329)
+  buf.write("000000 \0", 329, "ascii");
+  // devminor: 6 octal digits + space + null (offset 337)
+  buf.write("000000 \0", 337, "ascii");
+
+  // checksum: fill field with spaces first, compute sum, write "NNNNNN \0"
   buf.fill(0x20, 148, 156);
   let sum = 0;
   for (let i = 0; i < 512; i++) sum += buf[i];
-  buf.write(sum.toString(8).padStart(6, "0") + "\0\x20", 148, "ascii");
+  buf.write(sum.toString(8).padStart(6, "0") + " \0", 148, "ascii");
 
   return buf;
 }

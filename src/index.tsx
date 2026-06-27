@@ -12,11 +12,11 @@ const createVisualization: CreateCustomVisualization<Settings> = ({
     defaultSize: { width: 4, height: 3 },
 
     checkRenderable(series) {
-      if (series.length !== 1) {
+      if (!series || series.length !== 1) {
         throw new Error("A single query is required");
       }
-      const [{ data }] = series;
-      if (data.cols.length !== 1) {
+      const data = series[0]?.data;
+      if (!data || data.cols.length !== 1) {
         throw new Error("The query must return exactly 1 column");
       }
       if (data.rows.length !== 1) {
@@ -32,9 +32,10 @@ const createVisualization: CreateCustomVisualization<Settings> = ({
         getDefault() {
           return "";
         },
-        getProps({ series }) {
-          const col = series[0].data.cols[0];
-          return { placeholder: col.display_name || col.name };
+        // SDK signature: getProps(series: Series, vizSettings) — series is the array directly
+        getProps(series) {
+          const col = series?.[0]?.data?.cols?.[0];
+          return { placeholder: col?.display_name || col?.name || "" };
         },
       }),
       subtitle: defineSetting({

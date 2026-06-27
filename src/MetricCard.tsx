@@ -9,7 +9,7 @@ function formatValue(value: unknown, opts: { column: unknown }): string {
     if (typeof value === "number") {
       return new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }).format(value);
     }
-    return String(value ?? "");
+    return String(value ?? "—");
   }
 }
 
@@ -66,13 +66,14 @@ export function MetricCard({
   height,
   colorScheme,
 }: CustomVisualizationProps<Settings>) {
-  const [{ data }] = series;
-  const col = data.cols[0];
-  const value = data.rows[0][0];
+  // Defensive access: series/data/cols/rows may be absent during initialization
+  const firstSeries = series?.[0];
+  const col = firstSeries?.data?.cols?.[0];
+  const value = firstSeries?.data?.rows?.[0]?.[0];
 
-  const title = settings.title ?? col.display_name ?? col.name;
-  const subtitle = settings.subtitle;
-  const accentColor = settings.accent_color || "var(--mb-color-brand)";
+  const title = settings?.title ?? col?.display_name ?? col?.name ?? "";
+  const subtitle = settings?.subtitle;
+  const accentColor = settings?.accent_color || "var(--mb-color-brand)";
   const isDark = colorScheme === "dark";
 
   if (!width || !height) return null;
@@ -124,7 +125,7 @@ export function MetricCard({
           textAlign: "center",
         }}
       >
-        {formatValue(value, { column: col })}
+        {formatValue(value, { column: col ?? {} })}
       </div>
       {subtitle ? (
         <MarkdownLabel
