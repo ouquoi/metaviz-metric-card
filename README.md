@@ -1,6 +1,8 @@
 # Metric Card
 
-A clean KPI card for Metabase that displays a single numeric metric with a configurable label and accent color. Supports dark mode automatically.
+A clean KPI card for Metabase that displays a single numeric metric with a configurable label, subtitle and accent color. Supports dark mode automatically.
+
+![preview](assets/preview.png)
 
 ## Requirements
 
@@ -42,10 +44,23 @@ In the question editor, click the **visualization picker** (bottom left) and sel
 
 Click the **gear icon** to open visualization settings:
 
-| Setting | Description |
-|---------|-------------|
-| **Label** | Text displayed above the number. Supports Markdown: `**bold**`, `*italic*`, `~~strikethrough~~`, `` `code` ``. Defaults to the column name from your query. |
-| **Color** | Accent color for the number. Click to open the color picker. |
+| Setting | Description | Default |
+|---------|-------------|---------|
+| **Label** | Text displayed above the number. Supports Markdown (see below). | Column name from the query |
+| **Subtitle** | Optional text displayed below the number. Supports Markdown. | _(empty)_ |
+| **Color** | Accent color applied to the number. Click to open the color picker. | `#509EE3` |
+
+---
+
+## Capabilities
+
+| Feature | Details |
+|---------|---------|
+| **Number formatting** | Automatically uses Metabase's native formatter — respects locale, currency, and column semantic type |
+| **Responsive font size** | The number scales to fill the card at any size |
+| **Markdown in labels** | `**bold**`, `*italic*`, `~~strikethrough~~`, `` `code` `` — works in both Label and Subtitle |
+| **Dark mode** | Adapts automatically to Metabase's light and dark themes — no configuration needed |
+| **Dashboard sizing** | Minimum 2×2 · Default 4×3 dashboard units |
 
 ---
 
@@ -55,13 +70,7 @@ Click the **gear icon** to open visualization settings:
 |--------|------|-------|
 | 1 | Numeric | The only column returned by the query |
 
-> The query must return exactly 1 row and 1 column. If your query returns multiple rows, add an aggregation (COUNT, SUM, AVG, etc.).
-
----
-
-## Dark mode
-
-Metric Card automatically adapts to Metabase's light and dark themes — no configuration needed.
+> The query must return exactly 1 row and 1 column. If your query returns multiple rows, add an aggregation (`COUNT`, `SUM`, `AVG`, etc.).
 
 ---
 
