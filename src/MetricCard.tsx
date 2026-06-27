@@ -49,10 +49,10 @@ function MarkdownLabel({ text, style }: { text: string; style: React.CSSProperti
   return (
     <div style={style}>
       {tokens.map((token, i) => {
-        if (token.type === "bold") return <strong key={i}>{token.content}</strong>;
-        if (token.type === "italic") return <em key={i}>{token.content}</em>;
-        if (token.type === "strike") return <s key={i}>{token.content}</s>;
-        if (token.type === "code") return <code key={i} style={{ fontFamily: "monospace" }}>{token.content}</code>;
+        if (token.type === "bold") return <span key={i} style={{ fontWeight: 700 }}>{token.content}</span>;
+        if (token.type === "italic") return <span key={i} style={{ fontStyle: "italic" }}>{token.content}</span>;
+        if (token.type === "strike") return <span key={i} style={{ textDecoration: "line-through" }}>{token.content}</span>;
+        if (token.type === "code") return <span key={i} style={{ fontFamily: "monospace", opacity: 0.85 }}>{token.content}</span>;
         return <span key={i}>{token.content}</span>;
       })}
     </div>

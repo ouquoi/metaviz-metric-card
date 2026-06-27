@@ -7,7 +7,8 @@
     "build": "vite build && node pack.mjs",
     "dev": "vite build --watch",
     "preview:viz": "vite --config vite.preview.config.ts",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "clean:previews": "git rm --ignore-unmatch assets/preview*.png && echo Done"
   },
   "dependencies": {
     "react": "18.2.0",

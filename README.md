@@ -44,7 +44,7 @@ Click the **gear icon** to open visualization settings:
 
 | Setting | Description |
 |---------|-------------|
-| **Label** | Text displayed above the number. Defaults to the column name from your query. |
+| **Label** | Text displayed above the number. Supports Markdown: `**bold**`, `*italic*`, `~~strikethrough~~`, `` `code` ``. Defaults to the column name from your query. |
 | **Color** | Accent color for the number. Click to open the color picker. |
 
 ---
