@@ -29,12 +29,12 @@ const createVisualization: CreateCustomVisualization<Settings> = ({
         id: "title",
         title: "Label",
         widget: "input",
-        getDefault({ series }) {
-          const col = series[0].data.cols[0];
-          return col.display_name || col.name;
+        getDefault() {
+          return "";
         },
-        getProps() {
-          return { placeholder: "Supports **bold**, *italic*, ~~strike~~, `code`" };
+        getProps({ series }) {
+          const col = series[0].data.cols[0];
+          return { placeholder: col.display_name || col.name };
         },
       }),
       subtitle: defineSetting({

@@ -69,7 +69,7 @@ export function MetricCard({
   const col = data.cols[0];
   const value = data.rows[0][0];
 
-  const title = settings.title || col.display_name || col.name;
+  const title = settings.title ?? col.display_name ?? col.name;
   const subtitle = settings.subtitle;
   const accentColor = settings.accent_color || "var(--mb-color-brand)";
   const isDark = colorScheme === "dark";
@@ -99,17 +99,19 @@ export function MetricCard({
           : "var(--mb-color-bg-white, #ffffff)",
       }}
     >
-      <MarkdownLabel
-        text={title}
-        style={{
-          fontSize: titleSize,
-          fontWeight: 600,
-          color: mutedColor,
-          textTransform: "uppercase",
-          letterSpacing: "0.08em",
-          textAlign: "center",
-        }}
-      />
+      {title ? (
+        <MarkdownLabel
+          text={title}
+          style={{
+            fontSize: titleSize,
+            fontWeight: 600,
+            color: mutedColor,
+            textTransform: "uppercase",
+            letterSpacing: "0.08em",
+            textAlign: "center",
+          }}
+        />
+      ) : null}
       <div
         style={{
           fontSize,
