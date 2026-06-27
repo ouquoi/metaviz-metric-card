@@ -22,6 +22,7 @@ const MOCK_SERIES = [
 
 function Preview() {
   const [label, setLabel] = useState("**Total** Orders");
+  const [subtitle, setSubtitle] = useState("*vs last month* 📈");
   const [color, setColor] = useState("#509EE3");
   const [dark, setDark] = useState(false);
   const [value, setValue] = useState("42831");
@@ -98,6 +99,16 @@ function Preview() {
         </label>
 
         <label style={fieldStyle}>
+          Subtitle
+          <input
+            style={inputStyle}
+            value={subtitle}
+            onChange={e => setSubtitle(e.target.value)}
+            placeholder="Text below the number (optional)"
+          />
+        </label>
+
+        <label style={fieldStyle}>
           Value
           <input
             style={{ ...inputStyle, minWidth: "100px" }}
@@ -130,7 +141,7 @@ function Preview() {
       <div style={cardWrapperStyle}>
         <MetricCard
           series={series as any}
-          settings={{ title: label, accent_color: color }}
+          settings={{ title: label, subtitle, accent_color: color }}
           width={400}
           height={200}
           colorScheme={dark ? "dark" : "light"}

@@ -37,6 +37,17 @@ const createVisualization: CreateCustomVisualization<Settings> = ({
           return { placeholder: "Supports **bold**, *italic*, ~~strike~~, `code`" };
         },
       }),
+      subtitle: defineSetting({
+        id: "subtitle",
+        title: "Subtitle",
+        widget: "input",
+        getDefault() {
+          return "";
+        },
+        getProps() {
+          return { placeholder: "Text below the number (optional)" };
+        },
+      }),
       accent_color: defineSetting({
         id: "accent_color",
         title: "Color",
